@@ -2,7 +2,35 @@
 # Licence:  zlib/libpng
 # Year::    2017
 # Status::  beta
-# Description:: Change the theme of a specific application 
+# Description:: Change the theme of a specific application
+
+EXIT_PREREQ_UNAVAILABLE=80
+
+# This doesn't use actual bash arrays, but rather strings separated by arbitrary
+# characters. For actual arrays, use https://stackoverflow.com/a/8574392/5389585
+# Usage: detect_in_arr $val $arr $sep || echo $val is not in $arr
+function detect_in_arr(){
+  val="$1"
+  arr="$2"
+  sep="$3"
+
+  declare -A map
+  while IFS= read -r -d "$sep" name; do
+    map["$name"]=1
+  done <<<"$arr"
+
+  if [[ ${map["$val"]} ]] ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+if ! detect_in_arr "$HOME/bin" "$PATH" ":"; then
+  echo "$HOME/bin" must be in your \$PATH >&2
+  exit $EXIT_PREREQ_UNAVAILABLE
+fi
+
 
 #This will only work if you have $HOME/bin in your $PATH. To do this, add this line anywhere in ~/.bashrc:
 #  [ -d ~/bin ] && export PATH=~/bin:$PATH
